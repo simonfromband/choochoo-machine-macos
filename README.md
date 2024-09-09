@@ -7,4 +7,4 @@ pip install mido
 pip install pygame
 pip install customtkinter
 pip install pillow
-pip install rtmidi
+pip install python-rtmidi
