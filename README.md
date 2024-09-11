@@ -3,17 +3,15 @@ macos version of the choochoo software9000
 
 install python like normal
 
+**required python libraries and modules**
 
-curl https://bootstrap.pypa.io/get-pip.py | python3
+mido
 
-pip install mido
+pygame
 
-pip install pygame
+customtkinter
 
-pip install customtkinter
+pillow
 
-pip install pillow
-
-pip install python-rtmidi
-
+python-rtmidi
 (itll also ask to install commandline tools)
