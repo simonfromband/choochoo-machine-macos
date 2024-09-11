@@ -10,16 +10,16 @@ from PIL import Image, ImageTk
 import threading
 import time
 
-# Where files??
+#Where files??
 def get_resources_path():
-    if getattr(sys, 'frozen', False):  # If running from a bundled app
+    if getattr(sys, 'frozen', False):  #If running from a bundled app
         return os.path.join(os.path.dirname(sys.executable), 'Resources')
     else:
         return os.path.join(os.path.dirname(__file__), 'Resources')
 
-# START YOUR pygames ...with pre_init so the thing workss
+#START YOUR pygames ...with pre_init so the thing workss
 try:
-    pygame.mixer.pre_init(44100, -16, 2, 2048)  # THE THING THAT MAKES MACOS WORK
+    pygame.mixer.pre_init(44100, -16, 2, 2048)  #THE THING THAT MAKES MACOS WORK
     pygame.mixer.init()
 except pygame.error as e:
     print(f"Error initializing pygame mixer: {e}", file=sys.stderr)
@@ -32,19 +32,19 @@ class MidiPlayerApp:
 
         self.master.resizable(False, False)
 
-        # resource path
+        #resource path
         self.resources_path = get_resources_path()
 
-        # Load audio files
+        #Load audio files
         self.audio_files = self.load_audio_files()
 
         self.buttons = {}
         self.error_buttons = set()
         self.currently_playing = None
         self.midi_device_connected = False
-        self.midi_listener_active = False  # Tracks if MIDI listener is active
+        self.midi_listener_active = False  #Tracks if MIDI listener is active
 
-        # computer keyboard bindings
+        #computer keyboard bindings
         self.key_to_sample = {
             '1': 95,
             '2': 96,
@@ -57,27 +57,27 @@ class MidiPlayerApp:
             '9': 108
         }
 #OH BROTHER
-        # get screen and window siz
+        #get screen and window siz
         screen_width = self.master.winfo_screenwidth()
         screen_height = self.master.winfo_screenheight()
         window_width = 840
         window_height = 600
 
-        # open to the middle of the screen?? brother this aint workin
+        #open to the middle of the screen?? brother this aint workin
         x_position = (screen_width - window_width) // 2
         y_position = (screen_height - window_height) // 2 - 100
 
         self.master.geometry(f"{window_width}x{window_height}+{x_position}+{y_position}")
 
-        # Button grid
+        #Button grid
         self.frame = tk.Frame(master)
         self.frame.pack(side=tk.LEFT, padx=10, pady=10)
 
-        # frame for connection status and goofy ahhh pic
+        #frame for connection status and goofy ahhh pic
         self.top_frame = tk.Frame(master)
         self.top_frame.pack(side=tk.RIGHT, padx=10, pady=10, fill=tk.Y)
 
-        # MIDI connection status
+        #MIDI connection status
         self.midi_status_label = ctk.CTkLabel(
             self.top_frame,
             text="Ayyo, I'm not connected to the Synth. Plug me in, coach!",
@@ -92,19 +92,19 @@ class MidiPlayerApp:
 #THIS GUY STINKSSS!!!
 
         
-        # Clickable playback buttons
+        #Clickable playback buttons
         for audio_file, midi_note, display_name in self.audio_files:
             button_frame = tk.Frame(self.frame)
             button_frame.pack(pady=10)
             if os.path.isfile(audio_file):
                 button_text = f"Play {display_name}"
                 fg_color = "grey"
-                hover_color = "#404040"  # Darker grey for hover
+                hover_color = "#404040"  #Darker grey for hover
                 text_color = "white"
             else:
                 button_text = f"Where's {display_name}??🤨🤨"
                 fg_color = "red"
-                hover_color = "#a00a00"  # Darker red for hover
+                hover_color = "#a00a00"  #Darker red for hover
                 text_color = "white"
                 self.error_buttons.add(midi_note)
             play_button = ctk.CTkButton(
@@ -112,7 +112,7 @@ class MidiPlayerApp:
                 text=button_text,
                 command=lambda af=audio_file, mn=midi_note, dn=display_name: self.play_audio_file(af, mn, dn),
                 fg_color=fg_color,
-                hover_color=hover_color,  # Set hover color
+                hover_color=hover_color,  #Set hover color
                 text_color=text_color,
                 width=200
             )
@@ -123,7 +123,7 @@ class MidiPlayerApp:
 
 
         
-        # Reset button
+        #Reset button
         self.reset_button = ctk.CTkButton(
             self.frame,
             text="Reset Button Colors [DELETE]",
@@ -132,26 +132,26 @@ class MidiPlayerApp:
         self.reset_button.pack(pady=10)
 
         
-        # Stop playback button
+        #Stop playback button
         self.stop_button = ctk.CTkButton(
             self.frame, 
             text="Stop Playback [SPACEBAR]", 
             command=self.stop_playback,
             fg_color="red", 
             text_color="white",
-            hover_color="#c00"  # Darker red for hover
+            hover_color="#c00"  #Darker red for hover
         )
         self.stop_button.pack(pady=10)
 
 
 
         
-# Actually do stuff with the computer keyboard. useless unless parker borks the synth or something
+#Actually do stuff with the computer keyboard. useless unless parker borks the synth or something
         self.master.bind("<space>", self.trigger_stop_playback)
         self.master.bind("<BackSpace>", self.trigger_reset_button)
         for key, midi_note in self.key_to_sample.items():
             self.master.bind(f"<KeyPress-{key}>", lambda event, note=midi_note: self.trigger_sample(note))
-# Start MIDI listener thread!!!!!!!!
+#Start MIDI listener thread!!!!!!!!
         threading.Thread(target=self.check_midi_device_status, daemon=True).start()
     def load_audio_files(self):
         """Helper to load audio file paths and ensure they exist."""
@@ -176,7 +176,7 @@ class MidiPlayerApp:
         pygame.mixer.music.stop()
         if self.currently_playing:
             self.update_button_label(self.currently_playing, f"Already Played {self.get_display_name(self.currently_playing)}")
-            self.update_button_color(self.currently_playing, "orange", "#cc8400", "black")  # Darker orange for hover and black text
+            self.update_button_color(self.currently_playing, "orange", "#cc8400", "black")  #Darker orange for hover and black text
         self.currently_playing = None
 
     def load_and_display_image(self):
@@ -216,7 +216,7 @@ class MidiPlayerApp:
         if not pygame.mixer.music.get_busy():
             if self.currently_playing:
                 self.update_button_label(self.currently_playing, f"Already Played {self.get_display_name(self.currently_playing)}")
-                self.update_button_color(self.currently_playing, "orange", "#cc8400", "black")  # Darker orange for hover and black text
+                self.update_button_color(self.currently_playing, "orange", "#cc8400", "black")  #Darker orange for hover and black text
             self.currently_playing = None
         else:
             self.master.after(100, self.check_music_playback)
@@ -248,10 +248,10 @@ class MidiPlayerApp:
         self.stop_playback()
         for midi_note in self.buttons:
             if midi_note in self.error_buttons:
-                self.update_button_color(midi_note, "red", "#a00a00", "white")  # Darker red for hover and white text
+                self.update_button_color(midi_note, "red", "#a00a00", "white")  #Darker red for hover and white text
                 self.update_button_label(midi_note, f"Where's {self.get_display_name(midi_note)}??🤨🤨")
             else:
-                self.update_button_color(midi_note, "grey", "#404040", "white")  # Darker grey for hover and white text
+                self.update_button_color(midi_note, "grey", "#404040", "white")  #Darker grey for hover and white text
                 self.update_button_label(midi_note, f"Play {self.get_display_name(midi_note)}")
 
 
@@ -263,7 +263,7 @@ class MidiPlayerApp:
             input_names = mido.get_input_names()
             if input_names and not self.midi_device_connected:
                 self.midi_status_label.configure(text="Synth and Laptop are connected. Nice work!", text_color="green")
-                threading.Thread(target=self.start_midi_listener, daemon=True).start()  # Start MIDI listener
+                threading.Thread(target=self.start_midi_listener, daemon=True).start()  #Start MIDI listener
                 self.midi_device_connected = True
             elif not input_names and self.midi_device_connected:
                 self.midi_status_label.configure(text="No MIDI device connected", text_color="red")
