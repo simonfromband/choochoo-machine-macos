@@ -1,3 +1,4 @@
+#TO THOSE WHO IT MAY CONCERN: don't python on or for a mac
 import mido
 import pygame
 import tkinter as tk
@@ -9,16 +10,16 @@ from PIL import Image, ImageTk
 import threading
 import time
 
-# Function to get the path to the Resources directory
+# Where files??
 def get_resources_path():
     if getattr(sys, 'frozen', False):  # If running from a bundled app
         return os.path.join(os.path.dirname(sys.executable), 'Resources')
     else:
         return os.path.join(os.path.dirname(__file__), 'Resources')
 
-# Initialize pygame with pre_init for compatibility
+# START YOUR pygames ...with pre_init so the thing workss
 try:
-    pygame.mixer.pre_init(44100, -16, 2, 2048)  # Pre-initialize to avoid macOS issues
+    pygame.mixer.pre_init(44100, -16, 2, 2048)  # THE THING THAT MAKES MACOS WORK
     pygame.mixer.init()
 except pygame.error as e:
     print(f"Error initializing pygame mixer: {e}", file=sys.stderr)
@@ -29,10 +30,9 @@ class MidiPlayerApp:
         self.master = master
         self.master.title("Shawnee Heights Choo Choo Machine 9000")
 
-        # Prevent resizing
         self.master.resizable(False, False)
 
-        # Determine the path to the Resources directory
+        # resource path
         self.resources_path = get_resources_path()
 
         # Load audio files
@@ -44,42 +44,40 @@ class MidiPlayerApp:
         self.midi_device_connected = False
         self.midi_listener_active = False  # Tracks if MIDI listener is active
 
-        # Create a mapping of number keys to samples
+        # computer keyboard bindings
         self.key_to_sample = {
-            '1': 93,
-            '2': 95,
-            '3': 96,
-            '4': 98,
-            '5': 100,
-            '6': 101,
-            '7': 103,
-            '8': 105,
-            '9': 107,
-            '0': 108
+            '1': 95,
+            '2': 96,
+            '3': 98,
+            '4': 100,
+            '5': 101,
+            '6': 103,
+            '7': 105,
+            '8': 107,
+            '9': 108
         }
-
-        # Calculate screen and window size
+#OH BROTHER
+        # get screen and window siz
         screen_width = self.master.winfo_screenwidth()
         screen_height = self.master.winfo_screenheight()
         window_width = 840
         window_height = 600
 
-        # Calculate the position to center the window
+        # open to the middle of the screen?? brother this aint workin
         x_position = (screen_width - window_width) // 2
         y_position = (screen_height - window_height) // 2 - 100
 
-        # Set window geometry (width x height + x_position + y_position)
         self.master.geometry(f"{window_width}x{window_height}+{x_position}+{y_position}")
 
-        # Main frame for buttons
+        # Button grid
         self.frame = tk.Frame(master)
         self.frame.pack(side=tk.LEFT, padx=10, pady=10)
 
-        # Frame for the color explanation and image
+        # frame for connection status and goofy ahhh pic
         self.top_frame = tk.Frame(master)
         self.top_frame.pack(side=tk.RIGHT, padx=10, pady=10, fill=tk.Y)
 
-        # Dynamic label to show MIDI connection status
+        # MIDI connection status
         self.midi_status_label = ctk.CTkLabel(
             self.top_frame,
             text="Ayyo, I'm not connected to the Synth. Plug me in, coach!",
@@ -87,17 +85,17 @@ class MidiPlayerApp:
             font=("Arial", 12)
         )
         self.midi_status_label.pack(pady=(10, 5))
-
-        # Load and display the image
         self.image_path = os.path.join(self.resources_path, "pic.png")
         self.load_and_display_image()
 
-        # Create buttons for audio playback
+
+#THIS GUY STINKSSS!!!
+
+        
+        # Clickable playback buttons
         for audio_file, midi_note, display_name in self.audio_files:
             button_frame = tk.Frame(self.frame)
             button_frame.pack(pady=10)
-
-            # Determine the button text and color
             if os.path.isfile(audio_file):
                 button_text = f"Play {display_name}"
                 fg_color = "grey"
@@ -109,7 +107,6 @@ class MidiPlayerApp:
                 hover_color = "#a00a00"  # Darker red for hover
                 text_color = "white"
                 self.error_buttons.add(midi_note)
-
             play_button = ctk.CTkButton(
                 button_frame,
                 text=button_text,
@@ -122,6 +119,10 @@ class MidiPlayerApp:
             play_button.pack(side=tk.LEFT, padx=5)
             self.buttons[midi_note] = play_button
 
+
+
+
+        
         # Reset button
         self.reset_button = ctk.CTkButton(
             self.frame,
@@ -130,6 +131,7 @@ class MidiPlayerApp:
         )
         self.reset_button.pack(pady=10)
 
+        
         # Stop playback button
         self.stop_button = ctk.CTkButton(
             self.frame, 
@@ -141,31 +143,35 @@ class MidiPlayerApp:
         )
         self.stop_button.pack(pady=10)
 
-        # Bind key events
+
+
+        
+# Actually do stuff with the computer keyboard. useless unless parker borks the synth or something
         self.master.bind("<space>", self.trigger_stop_playback)
         self.master.bind("<BackSpace>", self.trigger_reset_button)
         for key, midi_note in self.key_to_sample.items():
             self.master.bind(f"<KeyPress-{key}>", lambda event, note=midi_note: self.trigger_sample(note))
-
-        # Start MIDI listener thread
+# Start MIDI listener thread!!!!!!!!
         threading.Thread(target=self.check_midi_device_status, daemon=True).start()
-
     def load_audio_files(self):
         """Helper to load audio file paths and ensure they exist."""
         files = [
-            ("sample 1.mp3", 93, "Sample 1"),
-            ("sample 2.mp3", 95, "Sample 2"),
-            ("sample 3.mp3", 96, "Sample 3"),
-            ("sample 4.mp3", 98, "Sample 4"),
-            ("sample 5.mp3", 100, "Sample 5"),
-            ("sample 6.mp3", 101, "Sample 6"),
-            ("sample 7.mp3", 103, "Sample 7"),
-            ("sample 8.mp3", 105, "Sample 8"),
-            ("sample 9.mp3", 107, "Sample 9"),
-            ("sample 10.mp3", 108, "Sample 10")
+            ("sample 1.mp3", 95, "Sample 1"),
+            ("sample 2.mp3", 96, "Sample 2"),
+            ("sample 3.mp3", 98, "Sample 3"),
+            ("sample 4.mp3", 100, "Sample 4"),
+            ("sample 5.mp3", 101, "Sample 5"),
+            ("sample 6.mp3", 103, "Sample 6"),
+            ("sample 7.mp3", 105, "Sample 7"),
+            ("sample 8.mp3", 107, "Sample 8"),
+            ("sample 9.mp3", 108, "Sample 9")
         ]
         return [(os.path.join(self.resources_path, f), midi_note, name) for f, midi_note, name in files]
 
+    
+#skull emoji
+
+    
     def stop_playback(self):
         pygame.mixer.music.stop()
         if self.currently_playing:
@@ -179,27 +185,32 @@ class MidiPlayerApp:
             image = Image.open(self.image_path)
             photo = ImageTk.PhotoImage(image)
             image_label = tk.Label(self.top_frame, image=photo)
-            image_label.image = photo  # Keep a reference
+            image_label.image = photo
             image_label.pack(pady=10)
         except Exception as e:
             print(f"Error loading image: {e}", file=sys.stderr)
 
+
+
+    
     def play_audio_file(self, audio_file, midi_note, display_name):
         """Play the selected audio file and update button color."""
         try:
             if self.currently_playing:
                 self.update_button_label(self.currently_playing, f"Already Played {self.get_display_name(self.currently_playing)}")
-                self.update_button_color(self.currently_playing, "orange", "#cc8400", "black")  # Darker orange for hover and black text
+                self.update_button_color(self.currently_playing, "orange", "#cc8400", "black")
 
             pygame.mixer.music.load(audio_file)
             pygame.mixer.music.play()
             self.update_button_label(midi_note, f"Now Playing {display_name}...")
-            self.update_button_color(midi_note, "#009900", "green", "white")  # Darker green for hover
+            self.update_button_color(midi_note, "#009900", "green", "white")
             self.currently_playing = midi_note
             self.master.after(100, self.check_music_playback)
         except pygame.error as e:
             print(f"Error playing {audio_file}: {e}", file=sys.stderr)
 
+
+    
     def check_music_playback(self):
         """Check if the music is still playing, and update button color."""
         if not pygame.mixer.music.get_busy():
@@ -215,13 +226,11 @@ class MidiPlayerApp:
         if midi_note in self.buttons:
             button = self.buttons[midi_note]
             button.configure(fg_color=color, hover_color=hover_color, text_color=text_color)
-
     def update_button_label(self, midi_note, text):
         """Update the button label text based on the MIDI note."""
         if midi_note in self.buttons:
             button = self.buttons[midi_note]
             button.configure(text=text)
-
     def get_display_name(self, midi_note):
         """Get the display name for the given MIDI note."""
         for _, note, name in self.audio_files:
@@ -229,6 +238,11 @@ class MidiPlayerApp:
                 return name
         return "Unknown"
 
+
+
+
+
+    
     def reset_button_colors(self):
         """Stop playback and reset button colors to grey, except for missing samples."""
         self.stop_playback()
@@ -240,6 +254,9 @@ class MidiPlayerApp:
                 self.update_button_color(midi_note, "grey", "#404040", "white")  # Darker grey for hover and white text
                 self.update_button_label(midi_note, f"Play {self.get_display_name(midi_note)}")
 
+
+
+    
     def check_midi_device_status(self):
         """Continuously check the MIDI device status and update the label."""
         while True:
@@ -253,6 +270,8 @@ class MidiPlayerApp:
                 self.midi_device_connected = False
             time.sleep(1)
 
+
+    
     def start_midi_listener(self):
         """Start listening for MIDI input and process MIDI events."""
         try:
@@ -269,23 +288,18 @@ class MidiPlayerApp:
         except Exception as e:
             print(f"MIDI Error: {e}", file=sys.stderr)
             self.midi_status_label.configure(text="MIDI error detected", text_color="red")
-
     def trigger_stop_playback(self, event):
         """Trigger the stop playback button."""
         self.stop_playback()
-
     def trigger_reset_button(self, event):
         """Trigger the reset button."""
         self.reset_button_colors()
-
     def trigger_sample(self, midi_note):
         """Trigger a sample based on the number key pressed."""
         for audio_file, note, display_name in self.audio_files:
             if note == midi_note:
                 self.play_audio_file(audio_file, note, display_name)
                 break
-
-# Main entry point
 if __name__ == "__main__":
     root = ctk.CTk()
     app = MidiPlayerApp(root)
